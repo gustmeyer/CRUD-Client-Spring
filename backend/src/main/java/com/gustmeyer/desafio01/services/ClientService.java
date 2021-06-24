@@ -1,12 +1,12 @@
 package com.gustmeyer.desafio01.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gustmeyer.desafio01.entity.Client;
 import com.gustmeyer.desafio01.repositories.ClientRepository;
@@ -22,14 +22,32 @@ public class ClientService {
 		return obj.get();
 	}
 	
-	public List<Client> findAll() {
-		List<Client> obj = repository.findAll();
-		return obj;
-	}
-	
+	@Transactional(readOnly = true)
 	public Page<Client> findAllPaged(PageRequest pageRequest) {
 		Page<Client> obj = repository.findAll(pageRequest);
 		return obj;
+	}
+	
+	@Transactional
+	public Client add(Client client) {
+		repository.save(client);
+		
+		return client;
+	}
+
+	@Transactional
+	public Client update(Long id, Client client) {
+		Client c = repository.getOne(id);
+		
+		c.setBirthDate(client.getBirthDate());
+		c.setChildren(client.getChildren());
+		c.setCpf(client.getCpf());
+		c.setIncome(client.getIncome());
+		c.setName(client.getName());
+		
+		c = repository.save(c);
+		
+		return c;
 	}
 
 }
